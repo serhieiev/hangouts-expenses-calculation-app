@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 sqlalchemy = "*"
 fastapi = "*"
+psycopg2-binary = "*"
+alembic = "*"
+python-dotenv = "*"
 
 [dev-packages]
 black = "*"
