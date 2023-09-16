@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import engine_from_config
 
-from src.app.config import DATABASE_URL
+from src.config import DATABASE_URL
 from src.app.models import Base
 
 

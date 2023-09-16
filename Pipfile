@@ -9,6 +9,16 @@ fastapi = "*"
 psycopg2-binary = "*"
 alembic = "*"
 python-dotenv = "*"
+pyjwt = "*"
+uvicorn = "*"
+bcrypt = "*"
+python-multipart = "*"
+asyncpg = "*"
+pydantic = {extras = ["email"], version = "*"}
+pytest = "*"
+httpx = "*"
+pytest-asyncio = "*"
+async-asgi-testclient = "*"
 
 [dev-packages]
 black = "*"
