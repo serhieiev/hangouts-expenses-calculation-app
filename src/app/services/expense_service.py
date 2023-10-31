@@ -9,6 +9,7 @@ from uuid import UUID
 async def create_expense(db: AsyncSession, expense: ExpenseCreate) -> Expense:
     new_expense = Expense(
         hangout_id=expense.hangout_id,
+        name = expense.name,
         amount=expense.amount,
 
     )
@@ -25,11 +26,15 @@ async def create_expense(db: AsyncSession, expense: ExpenseCreate) -> Expense:
     await db.commit()
     # Refresh the expense and eagerly load shared_users
     result = await db.execute(
-        select(Expense).options(joinedload(Expense.shared_users)).where(Expense.id == new_expense.id)
+        select(Expense).options(joinedload(Expense.shared_by)).where(Expense.id == new_expense.id)
     )
     return result.scalar()
 
 
 async def get_expenses_for_hangout(db: AsyncSession, hangout_id: UUID):
-    result = await db.execute(select(Expense).filter(Expense.hangout_id == hangout_id))
-    return result.scalars().all()
+    result = await db.execute(
+        select(Expense).options(joinedload(Expense.shared_by)).where(Expense.hangout_id == hangout_id)
+    )
+    return result.scalars().unique().all()
+
+

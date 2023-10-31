@@ -5,8 +5,9 @@ from typing import List, Optional
 
 class ExpenseBase(BaseModel):
     hangout_id: UUID
+    name: str
     amount: int
-    shared_by: Optional[List[UUID]]  # List of user UUIDs who share this expense
+    shared_by: Optional[List[str]]  # List of user UUIDs who share this expense
 
 class ExpenseCreate(ExpenseBase):
     pass

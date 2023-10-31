@@ -57,7 +57,7 @@ class User(Base, AuditMixinAt):
         secondary=expense_shared_by,
         primaryjoin="User.id==expense_shared_by.c.user_id",
         secondaryjoin="Expense.id==expense_shared_by.c.expense_id",
-        back_populates="shared_users"
+        back_populates="shared_by"
     )
     comments = relationship("Comment", primaryjoin="User.id==Comment.author_id", back_populates="author")
 
@@ -83,12 +83,13 @@ class Hangout(Base, AuditMixinAt, AuditMixinBy):
 class Expense(Base, AuditMixinAt, AuditMixinBy):
     __tablename__ = 'expenses'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    name = Column(String(255), nullable=False)
     hangout_id = Column(UUID(as_uuid=True), ForeignKey('hangouts.id'), nullable=False)
     amount = Column(Integer, nullable=False)
 
     # Relationships
     hangout = relationship("Hangout", back_populates="expenses")
-    shared_users = relationship(
+    shared_by = relationship(
         "User",
         secondary=expense_shared_by,
         primaryjoin="Expense.id==expense_shared_by.c.expense_id",
