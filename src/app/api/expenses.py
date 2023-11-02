@@ -46,3 +46,33 @@ async def list_expenses_for_hangout(hangout_id: UUID, _: User = Depends(get_curr
     
     return transformed_expenses
 
+@router.get("/hangouts/{hangout_id}/expenses/summary/", response_model=expense.ExpenseSummary)
+async def get_expense_summary_for_hangout(hangout_id: UUID, db: AsyncSession = Depends(get_db)):
+    try:
+        # Call the service layer to calculate expenses for a hangout
+        expense_summary = await expense_service.calculate_expenses_for_hangout(db, hangout_id)
+    except HTTPException as e:
+        # If the service raises an HTTPException, re-raise it
+        raise e
+    except Exception as e:
+        # Catch any other unexpected exceptions
+        raise HTTPException(status_code=500, detail=str(e))
+
+    # Construct the response model for the API
+    expenses_by_user_dict = {
+        user_id: expense.UserExpense(**details)
+        for user_id, details in expense_summary["expenses_by_user"].items()
+    }
+
+    individual_expenses_summary_dict = {
+        expense_id: expense.ExpenseDetail(**details)
+        for expense_id, details in expense_summary["individual_expenses_summary"].items()
+    }
+
+    response_model = expense.ExpenseSummary(
+        total_expenses=expense_summary["total_expenses"],
+        expenses_by_user=expenses_by_user_dict,
+        individual_expenses_summary=individual_expenses_summary_dict
+    )
+
+    return response_model
