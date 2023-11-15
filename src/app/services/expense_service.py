@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from src.app import models
 from src.app.models import Expense, expense_shared_by
 from src.app.services import hangout_service
-from src.app.schemas.expense import ExpenseCreate
+from src.app.schemas.expense import ExpenseCreate, IndividualExpense, ExpenseDetail, ExpenseSummary, UserExpense
 from src.app.schemas.hangout import HangoutDetails
 from uuid import UUID
 
@@ -44,37 +44,31 @@ async def get_expenses_for_hangout(db: AsyncSession, hangout_id: UUID):
 
 
 async def calculate_expenses_for_hangout(db: AsyncSession, hangout_id: UUID):
-    hangout_details: HangoutDetails = await hangout_service.get_hangout_details(db, hangout_id)
-    
-    if not hangout_details:
-        raise HTTPException(status_code=404, detail="Hangout not found")
-    
-    expenses = await get_expenses_for_hangout(db, hangout_id)
-    
-    # Initialize a dictionary to keep track of expenses per user
-    user_expenses = {participant.id: 0 for participant in hangout_details.participants}
+    # Query to get expenses for the hangout
+    result = await db.execute(
+        select(Expense).options(joinedload(Expense.shared_by)).where(Expense.hangout_id == hangout_id)
+    )
+    expenses = result.scalars().unique().all()
 
-    # Calculate each user's total expense
-    for expense in expenses:
-        amount_per_user = expense.amount / len(expense.shared_by)
-        for user_id in expense.shared_by:
-            user_expenses[user_id.id] += amount_per_user
-    
-    # Now we can construct a summary of expenses
+    # Initialize the expenses summary
     expenses_summary = {
-    "total_expenses": 0,
-    "individual_expenses_summary": {},
-    "expenses_by_user": {}
-}
+        "total_expenses": 0,
+        "individual_expenses_summary": {},
+        "expenses_by_user": {}
+    }
 
+    # Process each expense
     for expense in expenses:
         expense_id_str = str(expense.id)
+        split_amount = expense.amount / len(expense.shared_by)
+
+        # Update individual expenses summary
         expenses_summary["individual_expenses_summary"][expense_id_str] = {
             "name": expense.name,
             "total_amount": expense.amount
         }
-        
-        split_amount = expense.amount / len(expense.shared_by)
+
+        # Update expenses by user
         for user in expense.shared_by:
             user_id_str = str(user.id)
             if user_id_str not in expenses_summary["expenses_by_user"]:
@@ -90,7 +84,16 @@ async def calculate_expenses_for_hangout(db: AsyncSession, hangout_id: UUID):
                 "name": expense.name,
                 "amount": split_amount
             })
-        expenses_summary["total_expenses"] += expense.amount
-        
 
-    return expenses_summary
+        # Update total expenses
+        expenses_summary["total_expenses"] += expense.amount
+
+    # Transform the summary into the appropriate model format
+    for user_id, user_expense in expenses_summary["expenses_by_user"].items():
+        user_expense["individual_expenses"] = [IndividualExpense(**ie) for ie in user_expense["individual_expenses"]]
+        expenses_summary["expenses_by_user"][user_id] = UserExpense(**user_expense)
+
+    for expense_id, expense_detail in expenses_summary["individual_expenses_summary"].items():
+        expenses_summary["individual_expenses_summary"][expense_id] = ExpenseDetail(**expense_detail)
+
+    return ExpenseSummary(**expenses_summary)

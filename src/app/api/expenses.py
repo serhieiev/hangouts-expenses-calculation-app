@@ -58,21 +58,5 @@ async def get_expense_summary_for_hangout(hangout_id: UUID, db: AsyncSession = D
         # Catch any other unexpected exceptions
         raise HTTPException(status_code=500, detail=str(e))
 
-    # Construct the response model for the API
-    expenses_by_user_dict = {
-        user_id: expense.UserExpense(**details)
-        for user_id, details in expense_summary["expenses_by_user"].items()
-    }
-
-    individual_expenses_summary_dict = {
-        expense_id: expense.ExpenseDetail(**details)
-        for expense_id, details in expense_summary["individual_expenses_summary"].items()
-    }
-
-    response_model = expense.ExpenseSummary(
-        total_expenses=expense_summary["total_expenses"],
-        expenses_by_user=expenses_by_user_dict,
-        individual_expenses_summary=individual_expenses_summary_dict
-    )
-
-    return response_model
+    # Return expense_summary that is ExpenseSummary object
+    return expense_summary
