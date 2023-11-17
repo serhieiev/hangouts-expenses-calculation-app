@@ -1,0 +1,81 @@
+name: Backend - Lint, Test, Dockerize Python BE
+run-name: Backend-${{ github.sha }}
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'Pipfile'
+      - 'Pipfile.lock'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'Pipfile'
+      - 'Pipfile.lock'
+  workflow_dispatch: 
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      chosen-os:
+        required: true
+        type: choice
+        options:
+        - ubuntu-latest
+        - ubuntu-20.04
+        - self-hosted
+
+jobs:
+  lint-test-build:
+    runs-on: ${{ inputs.chosen-os || 'ubuntu-latest' }}
+    env:
+      TRUNCATED_SHA: ${{ github.sha }}
+      PYTHON_VERSION: 3.10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Pipenv and dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv install --dev
+
+    - name: Lint with flake8
+      run: |
+        pipenv run flake8 src/
+
+    - name: Test with pytest
+      run: |
+        pipenv run pytest tests/
+
+    - name: Set truncated SHA
+      run: echo "TRUNCATED_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+    - name: Build Docker image
+      run: |
+        pipenv lock -r > requirements.txt
+        docker build -t be_hangouts_app_${{ env.TRUNCATED_SHA }} .
+
+    - name: Save Docker image to file
+      run: |
+        mkdir -p images
+        docker save be_hangouts_app_${{ env.TRUNCATED_SHA }} > images/be_hangouts_app_${{ env.TRUNCATED_SHA }}.tar
+
+    - name: Upload Docker image as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: be_hangouts_app_${{ env.TRUNCATED_SHA }}
+        path: images/be_hangouts_app_${{ env.TRUNCATED_SHA }}.tar
+        retention-days: 1
