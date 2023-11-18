@@ -19,6 +19,7 @@ pytest = "*"
 httpx = "*"
 pytest-asyncio = "*"
 async-asgi-testclient = "*"
+ruff = "*"
 
 [dev-packages]
 black = "*"

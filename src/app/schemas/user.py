@@ -10,18 +10,19 @@ class UserCreate(BaseModel):
     password: str
     avatar: Optional[str]
 
-    @validator('password')
+    @validator("password")
     def validate_password(cls, password: str) -> str:
         if len(password) < 8:
-            raise ValueError('Password must be at least 8 characters long')
-        
+            raise ValueError("Password must be at least 8 characters long")
+
         if not re.search(r"[0-9]", password):
-            raise ValueError('Password must contain at least one digit')
-        
+            raise ValueError("Password must contain at least one digit")
+
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-            raise ValueError('Password must contain at least one special character')
-        
+            raise ValueError("Password must contain at least one special character")
+
         return password
+
 
 class UserResponse(BaseModel):
     id: UUID
@@ -30,6 +31,7 @@ class UserResponse(BaseModel):
     created_at: datetime
     modified_at: datetime
 
+
 class UserInDB(BaseModel):
     id: UUID
     email: EmailStr
@@ -37,9 +39,11 @@ class UserInDB(BaseModel):
     created_at: datetime
     modified_at: datetime
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
 
 class TokenData(BaseModel):
     email: Optional[str] = None

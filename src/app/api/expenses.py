@@ -10,10 +10,15 @@ from src.app.api.users import get_current_user
 
 router = APIRouter()
 
+
 @router.post("/expenses/", response_model=expense.Expense)
-async def create_new_expense(expense_data: expense.ExpenseCreate, _: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def create_new_expense(
+    expense_data: expense.ExpenseCreate,
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
     db_expense = await expense_service.create_expense(db=db, expense=expense_data)
-    
+
     # Convert the ORM Expense object to the Pydantic Expense model
     return expense.Expense(
         id=db_expense.id,
@@ -22,13 +27,20 @@ async def create_new_expense(expense_data: expense.ExpenseCreate, _: User = Depe
         amount=db_expense.amount,
         shared_by=[user.id for user in db_expense.shared_by],
         created_at=db_expense.created_at,
-        modified_at=db_expense.modified_at
+        modified_at=db_expense.modified_at,
     )
 
+
 @router.get("/hangouts/{hangout_id}/expenses/", response_model=List[expense.Expense])
-async def list_expenses_for_hangout(hangout_id: UUID, _: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    db_expenses = await expense_service.get_expenses_for_hangout(db, hangout_id=hangout_id)
-    
+async def list_expenses_for_hangout(
+    hangout_id: UUID,
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    db_expenses = await expense_service.get_expenses_for_hangout(
+        db, hangout_id=hangout_id
+    )
+
     # Transform each ORM Expense object to a Pydantic Expense model
     transformed_expenses = []
     for db_expense in db_expenses:
@@ -40,17 +52,24 @@ async def list_expenses_for_hangout(hangout_id: UUID, _: User = Depends(get_curr
                 amount=db_expense.amount,
                 shared_by=[user.email for user in db_expense.shared_by],
                 created_at=db_expense.created_at,
-                modified_at=db_expense.modified_at
+                modified_at=db_expense.modified_at,
             )
         )
-    
+
     return transformed_expenses
 
-@router.get("/hangouts/{hangout_id}/expenses/summary/", response_model=expense.ExpenseSummary)
-async def get_expense_summary_for_hangout(hangout_id: UUID, db: AsyncSession = Depends(get_db)):
+
+@router.get(
+    "/hangouts/{hangout_id}/expenses/summary/", response_model=expense.ExpenseSummary
+)
+async def get_expense_summary_for_hangout(
+    hangout_id: UUID, db: AsyncSession = Depends(get_db)
+):
     try:
         # Call the service layer to calculate expenses for a hangout
-        expense_summary = await expense_service.calculate_expenses_for_hangout(db, hangout_id)
+        expense_summary = await expense_service.calculate_expenses_for_hangout(
+            db, hangout_id
+        )
     except HTTPException as e:
         # If the service raises an HTTPException, re-raise it
         raise e

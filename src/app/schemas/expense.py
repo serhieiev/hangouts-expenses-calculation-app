@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
 from typing import List, Dict, Optional
+
 
 class ExpenseBase(BaseModel):
     hangout_id: UUID
@@ -9,27 +10,33 @@ class ExpenseBase(BaseModel):
     amount: int
     shared_by: Optional[List[str]]  # List of user UUIDs who share this expense
 
+
 class ExpenseCreate(ExpenseBase):
     pass
+
 
 class Expense(ExpenseBase):
     id: UUID
     created_at: datetime
     modified_at: datetime
 
+
 class IndividualExpense(BaseModel):
     expense_id: str
     name: str
     amount: int
+
 
 class UserExpense(BaseModel):
     email: str
     total_expense: int
     individual_expenses: List[IndividualExpense]
 
+
 class ExpenseDetail(BaseModel):
     name: str
     total_amount: int
+
 
 class ExpenseSummary(BaseModel):
     total_expenses: int

@@ -4,6 +4,7 @@ from async_asgi_testclient import TestClient
 from src.main import app
 from src.database import engine, Base, AsyncSessionLocal
 
+
 @pytest.fixture(scope="session", autouse=True)
 def set_event_loop():
     loop = asyncio.get_event_loop()
@@ -11,9 +12,11 @@ def set_event_loop():
     yield
     asyncio.set_event_loop(None)
 
+
 @pytest.fixture(scope="function")
 def client():
     return TestClient(app)
+
 
 @pytest.fixture(scope="module")
 async def test_db():
@@ -26,6 +29,7 @@ async def test_db():
     # Drop the test database tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
 
 @pytest.fixture
 async def db_session(test_db):  # Added test_db as a dependency

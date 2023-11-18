@@ -19,6 +19,7 @@ router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login/")
 
+
 @router.post("/register/", response_model=user.UserInDB, status_code=201)
 async def register(user: user.UserCreate, db: AsyncSession = Depends(get_db)):
     db_user = await user_service.get_user_by_email(db, email=user.email)
@@ -26,8 +27,11 @@ async def register(user: user.UserCreate, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return await user_service.create_user(db=db, user=user)
 
+
 @router.post("/login/", response_model=user.Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
+):
     user = await user_service.get_user_by_email(db, email=form_data.username)
     if not user or not utils.verify_password(form_data.password, user.password):
         raise HTTPException(
@@ -40,7 +44,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
