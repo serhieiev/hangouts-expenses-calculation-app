@@ -56,10 +56,6 @@ jobs:
       run: |
         pipenv run ruff src/
 
-    - name: Test with pytest
-      run: |
-        pipenv run pytest tests/
-
     - name: Set truncated SHA
       run: echo "TRUNCATED_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 

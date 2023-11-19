@@ -1,12 +1,11 @@
 import jwt
-from datetime import timedelta
 
 from fastapi import Depends, HTTPException, APIRouter, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.app.services import user_service
-from src.config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from src.config import ALGORITHM, SECRET_KEY
 from src.database import get_db
 
 from src.app.models import User
