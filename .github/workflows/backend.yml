@@ -35,7 +35,7 @@ jobs:
     runs-on: ${{ inputs.chosen-os || 'ubuntu-latest' }}
     env:
       TRUNCATED_SHA: ${{ github.sha }}
-      PYTHON_VERSION: 3.10
+      PYTHON_VERSION: '3.10'
 
     steps:
     - name: Checkout code
@@ -52,9 +52,9 @@ jobs:
         pip install pipenv
         pipenv install --dev
 
-    - name: Lint with flake8
+    - name: Lint with ruff
       run: |
-        pipenv run flake8 src/
+        pipenv run ruff src/
 
     - name: Test with pytest
       run: |
