@@ -61,7 +61,6 @@ jobs:
 
     - name: Build Docker image
       run: |
-        pipenv lock -r > requirements.txt
         docker build -t be_hangouts_app_${{ env.TRUNCATED_SHA }} .
 
     - name: Save Docker image to file
