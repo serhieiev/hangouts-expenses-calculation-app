@@ -11,7 +11,7 @@ RUN pip install pipenv
 COPY . .
 
 # Install dependencies using Pipenv
-RUN pipenv install --ignore-pipfile
+RUN pipenv install --ignore-pipfile --python 3.10
 
 # Run the application
-CMD ["uvicorn src.main:app --reload"]
+CMD ["uvicorn", "src.main:app", "--reload"]
