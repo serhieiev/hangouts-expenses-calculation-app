@@ -61,7 +61,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t be_hangouts_app_${{ env.TRUNCATED_SHA }} .
+        docker build -t be_hangouts_app_${{ env.TRUNCATED_SHA }} -f src/Dockerfile
 
     - name: Save Docker image to file
       run: |
