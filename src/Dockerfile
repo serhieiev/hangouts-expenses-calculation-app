@@ -1,5 +1,5 @@
 # Use slim-bookworm as a parent image
-FROM python:3.11-slim-bookworm
+FROM python:3.10-slim-bookworm
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
