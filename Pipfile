@@ -23,6 +23,7 @@ ruff = "*"
 
 [dev-packages]
 black = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.10"
