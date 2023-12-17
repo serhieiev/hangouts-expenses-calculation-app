@@ -19,12 +19,10 @@ pytest = "*"
 httpx = "*"
 pytest-asyncio = "*"
 async-asgi-testclient = "*"
-ruff = "*"
 
 [dev-packages]
-black = "*"
 pytest-mock = "*"
+ruff = "*"
 
 [requires]
 python_version = "3.10"
-python_full_version = "3.10.12"

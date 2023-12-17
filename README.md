@@ -41,12 +41,18 @@ Imagine that every week you meet with friends at some venue to have some tea and
 - The author of the comment should be able to update or delete it.
 
 ## Technical Stack
+
+### App
 - FastAPI
 - Pydantic
 - PostgreSQL
 - SQLAlchemy
 - Alembic
 - JWT
+
+### CI/CD
+- Docker
+- GitHub Actions
 
 ## Run Application
 To run application locally:

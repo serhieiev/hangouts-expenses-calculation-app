@@ -32,8 +32,10 @@ async def test_db():
 @pytest.fixture
 def mock_current_user(mocker):
     test_user = User(
-        id="some-unique-id",
-        email="c9d3e1d6-fa36-4c7a-b468-dcd4fe677855"
+        id="c9d3e1d6-fa36-4c7a-b468-dcd4fe677855",
+        email="test@example.com",
+        password = "P@ssw0rd",
+        avatar = "someavatar"
     )
 
     # Use mocker.patch to mock get_current_user dependency
