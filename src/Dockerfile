@@ -1,24 +1,3 @@
-# # Use python:3.10-slim as a base image
-# FROM python:3.10-slim as base
-
-# # Set the working directory in the container
-# WORKDIR /usr/src/app
-
-# # Install Pipenv
-# RUN pip install pipenv
-
-# # Copy the Pipfile and Pipfile.lock into the container
-# COPY Pipfile Pipfile.lock ./
-
-# # Install dependencies using Pipenv in the system python, not in a virtualenv
-# RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --ignore-pipfile
-
-# # Copy the rest of the application
-# COPY . .
-
-# # Run the application
-# CMD ["uvicorn", "src.main:app", "--reload"]
-
 # Define the Python version as an argument
 ARG PYTHON_VERSION=3.11
 
